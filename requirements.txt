@@ -4,3 +4,4 @@ sqlparse
 pillow
 psycopg2-binary
 djangorestframework
+rest_framework_simplejwt

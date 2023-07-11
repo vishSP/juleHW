@@ -1,3 +1,4 @@
+
 from rest_framework import viewsets, generics
 
 from vinsky.models import Сourse, Lesson
@@ -10,21 +11,27 @@ class СourseViewSet(viewsets.ModelViewSet):
     queryset = Сourse.objects.all()
 
 
-class LessonCreateAPIView(generics.CreateAPIView):
-    serializer_class = LessonSerializer
-
-
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
+
+
+class LessonCreateAPIView(generics.CreateAPIView):
+    serializer_class = LessonSerializer
+    queryset = Lesson.objects.all()
+
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
 
-class LessonUpdateAPIView(generics.UpdateAPIView):
+
+class LessonUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
 
+
+
 class LessonDestroyAPIView(generics.DestroyAPIView):
+    serializer_class = LessonSerializer
     queryset = Lesson.objects.all()

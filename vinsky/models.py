@@ -1,5 +1,7 @@
 from django.db import models
+
 NULLABLE = {'blank': True, 'null': True}
+
 
 class Сourse(models.Model):
     title = models.CharField(max_length=150, verbose_name='Название курса')
@@ -13,11 +15,13 @@ class Сourse(models.Model):
         verbose_name = 'курс'
         verbose_name_plural = 'курсы'
 
+
 class Lesson(models.Model):
-    title = models.CharField(max_length=150, verbose_name='Название курса')
+    title = models.CharField(max_length=150, verbose_name='Название урока')
     preview = models.ImageField(upload_to='lesson/', **NULLABLE, verbose_name='Изображение')
     text = models.TextField(verbose_name='описание')
     link = models.CharField(max_length=200, verbose_name='ссылка на видео')
+    course = models.ForeignKey(Сourse, on_delete=models.CASCADE, **NULLABLE, verbose_name='курс')
 
     def __str__(self):
         return f'{self.title}'
