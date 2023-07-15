@@ -1,0 +1,22 @@
+[
+{
+  "model": "users.user",
+  "pk": 1,
+  "fields": {
+    "password": "vtufvfvf163",
+    "last_login": null,
+    "is_superuser": false,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2023-06-29T20:24:08.805Z",
+    "email": "hihi64741@gmail.com",
+    "phone": "89023746751",
+    "city": "Samara",
+    "avatar": "",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]
