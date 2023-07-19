@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     payment = PaymentSerializer(source='payments_set', many=True)
 
     def create(self, validated_data):
-        payment = validated_data.pop('payment_set')
+        payment = validated_data.pop('payment_set', [])
         user = User.objects.create(**validated_data)
 
         for pay in payment:

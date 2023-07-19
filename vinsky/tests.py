@@ -268,6 +268,7 @@ class PaymentsTestCase(SetupTestCase):
         self.assertEqual(response_1.status_code, status.HTTP_200_OK)
         self.assertEqual(response_2.status_code, status.HTTP_200_OK)
 
+
     def test_payment_destroy(self):
         self.client.post('/courses/payment/create/', self.test_data_course)
         self.client.post('/courses/payment/create/', self.test_data_lesson)
