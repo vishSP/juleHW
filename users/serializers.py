@@ -45,3 +45,4 @@ class AuthUserSerializer(serializers.ModelSerializer):
             'city',
             'avatar',
         )
+

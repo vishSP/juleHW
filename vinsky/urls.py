@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from django.urls import path
 from vinsky.views import СourseViewSet, LessonCreateAPIView, LessonListAPIView, LessonRetrieveAPIView, \
     LessonUpdateAPIView, LessonDestroyAPIView, PaymentsCreateAPIView, PaymentsListAPIView, \
-    PaymentsDetailAPIView, PaymentsUpdateAPIView, PaymentsDeleteAPIView
+    PaymentsDetailAPIView, PaymentsUpdateAPIView, PaymentsDeleteAPIView, SubscriptionCreateView, SubscriptionDeleteView, \
+    SubscriptionUpdateView
 
 app_name = VinskyConfig.name
 
@@ -24,5 +25,10 @@ urlpatterns = [
     path('paymentv/detail/<int:pk>/', PaymentsDetailAPIView.as_view(), name='payment_detail'),
     path('payment/update/<int:pk>/', PaymentsUpdateAPIView.as_view(), name='payment_update'),
     path('payment/delete/<int:pk>/', PaymentsDeleteAPIView.as_view(), name='payment_delete'),
+
+    #Subscription
+    path('subscriptions/create/', SubscriptionCreateView.as_view(), name='subscription_create'),
+    path('subscriptions/delete/<int:pk>/', SubscriptionDeleteView.as_view(), name='subscription_delete'),
+    path('subscriptions/update/<int:pk>/', SubscriptionUpdateView.as_view(), name='subscription_update'),
 
               ] + router.urls

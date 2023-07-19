@@ -6,3 +6,9 @@ psycopg2-binary
 djangorestframework
 rest_framework_simplejwt
 django-filter
+coverage
+PyJWT
+pytz
+sqlparse
+typing_extensions
+tzdata

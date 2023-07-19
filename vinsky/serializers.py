@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from vinsky.models import Сourse, Lesson, Payments
+from vinsky.models import Сourse, Lesson, Payments, Subscription
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -40,4 +40,9 @@ class СourseSerializer(serializers.ModelSerializer):
 class PaymentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payments
+        fields = '__all__'
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
         fields = '__all__'

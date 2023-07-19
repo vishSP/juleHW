@@ -45,7 +45,18 @@ INSTALLED_APPS = [
     'users',
     'vinsky',
 ]
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000",
+    "http://read.only.com",
+    "http://change.allowed.com",
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://change.allowed.com",
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
