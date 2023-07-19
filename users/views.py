@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAdminUser
 
 from users.models import User
 from users.permissions import IsUserProfile
-from users.serializers import UserSerializer, CustomTokenObtainPairSerializer, AuthUserSerializer
+from users.serializers import UserSerializer, AuthUserSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 class UserViewSet(viewsets.ModelViewSet):
