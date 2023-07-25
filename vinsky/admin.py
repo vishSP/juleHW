@@ -4,14 +4,14 @@ from vinsky.models import Сourse, Lesson, Subscription
 
 @admin.register(Сourse)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'preview', 'text', 'author')
+    list_display = ('id','title', 'preview', 'text', 'user')
 
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ('title', 'preview', 'text', 'link', 'course', 'author')
+    list_display = ('id','title', 'preview', 'text', 'link', 'course', 'user')
 
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('course', 'user', 'status')
+    list_display = ('id','course', 'user', 'payment', 'status')

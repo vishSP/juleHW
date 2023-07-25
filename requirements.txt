@@ -12,3 +12,6 @@ pytz
 sqlparse
 typing_extensions
 tzdata
+drf-yasg
+django-cors-headers
+requests

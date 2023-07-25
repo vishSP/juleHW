@@ -38,12 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'drf_yasg',
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
 
     'users',
     'vinsky',
+
 ]
 CORS_ALLOWED_ORIGINS = [
     "https://example.com",
@@ -65,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -196,3 +200,22 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+CORS_ALLOWED_ORIGINS = [
+    'https://*',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000",
+    "http://read.only.com",
+    "http://change.allowed.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+     "https://read-and-write.example.com",
+ ]
+
+STRIPE_SECRET_KEY = 'sk_test_51NWbXnEwoqj1c3K363MYcfFnTD1KGTjxGyZOAAFMgrRb0IMme97dSe4WMn8qjM6hoJhjNtZLUMXCrHsrRCIQmk8b00BhO89fBz'

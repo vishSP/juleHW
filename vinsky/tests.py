@@ -1,9 +1,9 @@
-
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.test import APITestCase
 from datetime import datetime
 
 from rest_framework import status
-from vinsky.models import Сourse, Lesson
+from vinsky.models import Сourse, Lesson, Payments, Subscription
 from users.models import User
 
 
@@ -27,7 +27,7 @@ class CourseTestCase(SetupTestCase):
     def setUp(self):
         self.test_data = {'name': 'test', 'description': 'test'}
         self.test_response_data = {
-            'name': 'test', 'preview': None, 'description': 'test', 'author': None,
+            'name': 'test', 'preview': None, 'description': 'test', 'price': 5000, 'user': None,
             'subscription': False, 'lessons_count': 0, 'lessons': []
         }
 
@@ -58,10 +58,11 @@ class CourseTestCase(SetupTestCase):
         self.test_course_create()
         response = self.client.patch('/courses/course/5/', {'name': 'test!!!'})
 
-        self.assertEqual(response.json(), {'title': 'test!!!',
+        self.assertEqual(response.json(), {'name': 'test!!!',
                                            'preview': None,
-                                           'text': 'test',
-                                           'author': None,
+                                           'description': 'test',
+                                           'price': 5000,
+                                           'user': None,
                                            'subscription': False,
                                            'lessons_count': 0,
                                            'lessons': []})
@@ -82,7 +83,7 @@ class LessonTestCase(SetupTestCase):
                           'link': 'https://www.youtube.com/watch?v=747w5Zjm-C4&ab_channel=AlexTerrible'}
         self.test_response_data = {'title': 'test', 'text': 'test', 'preview': None,
                                    'link': 'https://www.youtube.com/watch?v=747w5Zjm-C4&ab_channel=AlexTerrible',
-                                   'author': self.user.id}
+                                   'user': self.user.id}
 
     def test_lesson_create(self):
         response = self.client.post('/courses/lesson/create/', self.test_data)
@@ -131,7 +132,29 @@ class LessonTestCase(SetupTestCase):
 class SubscribeTestCase(SetupTestCase):
     def setUp(self):
         super().setUp()
-        self.course = Сourse.objects.create(title='test', text='test')
+
+        self.course = Course.objects.create(
+            name='Test course',
+            description='Test description',
+            price=100
+        )
+
+    def test_subscription_create(self):
+        payment = Payments.objects.create(payment_amount=100, user=self.user)
+        data = {
+            'course': self.course.id,
+            'user': self.user.id,
+            'payment': payment.id
+        }
+
+        response = self.client.post('/courses/subscriptions/create/', data)
+        self.assertEqual(response.status_code, 201)
+
+        subscription = Subscription.objects.get(id=response.data['id'])
+        self.assertEqual(subscription.course, self.course)
+        self.assertEqual(subscription.user, self.user)
+        self.assertEqual(subscription.payment, payment)
+        self.assertFalse(subscription.status)
 
     def test_subscription_create(self):
         response = self.client.post('/courses/subscriptions/create/',
@@ -148,135 +171,18 @@ class SubscribeTestCase(SetupTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_subscription_delete(self):
-        self.test_subscription_create()
-        response = self.client.delete('/courses/subscriptions/delete/2/')
+        subscription = Subscription.objects.create(
+            course=self.course,
+            user=self.user,
+            payment=Payments.objects.create(user=self.user, payment_amount=100)
+        )
 
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        url = f'/courses/subscriptions/delete/{subscription.id}/'
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 204)
 
-
-class PaymentsTestCase(SetupTestCase):
-    def setUp(self):
-        super().setUp()
-
-        self.course = Сourse.objects.create(title='test', text='test')
-        self.lesson = Lesson.objects.create(title='test', text='test')
-
-        self.test_data_course = {"amount": 45000, "payment_type": "cash", "user": self.user.id,
-                                 "paid_course": self.course.id}
-        self.test_data_lesson = {"amount": 5000, "payment_type": "card", "user": self.user.id,
-                                 "paid_lesson": self.lesson.id}
-
-    def test_payment_create(self):
-        response_1 = self.client.post('/courses/payment/create/', self.test_data_course)
-        response_2 = self.client.post('/courses/payment/create/', self.test_data_lesson)
-
-        expected_course_payment = {"id": 1,
-                                   "payday": datetime.now().strftime('%Y-%m-%d'),
-                                   "amount": 45000,
-                                   "payment_type": "cash",
-                                   "user": self.user.id,
-                                   "paid_course": self.course.id,
-                                   "paid_lesson": None
-                                   }
-        expected_lesson_payment = {"id": 2,
-                                   "payday": datetime.now().strftime('%Y-%m-%d'),
-                                   "amount": 5000,
-                                   "payment_type": "card",
-                                   "user": self.user.id,
-                                   "paid_course": None,
-                                   "paid_lesson": self.lesson.id
-                                   }
-        self.assertEqual(response_1.json(), expected_course_payment)
-        self.assertEqual(response_2.json(), expected_lesson_payment)
-
-        self.assertEqual(response_1.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response_2.status_code, status.HTTP_201_CREATED)
-
-    def test_payment_list(self):
-        self.client.post('/courses/payment/create/', self.test_data_course)
-        self.client.post('/courses/payment/create/', self.test_data_lesson)
-        response = self.client.get('/courses/payment/')
-
-        self.assertEqual(response.json(), [{"id": 5,
-                                            "payday": datetime.now().strftime('%Y-%m-%d'),
-                                            "amount": 45000,
-                                            "payment_type": "cash",
-                                            "user": self.user.id,
-                                            "paid_course": self.course.id,
-                                            "paid_lesson": None
-                                            },
-                                           {"id": 6,
-                                            "payday": datetime.now().strftime('%Y-%m-%d'),
-                                            "amount": 5000,
-                                            "payment_type": "card",
-                                            "user": self.user.id,
-                                            "paid_course": None,
-                                            "paid_lesson": self.lesson.id
-                                            }])
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_payment_retrieve(self):
-        self.client.post('/courses/payment/create/', self.test_data_course)
-        self.client.post('/courses/payment/create/', self.test_data_lesson)
-        response_1 = self.client.get('/courses/payment/detail/7/')
-        response_2 = self.client.get('/courses/payment/detail/8/')
-
-        self.assertEqual(response_1.json(), {"id": 7,
-                                             "payday": datetime.now().strftime('%Y-%m-%d'),
-                                             "amount": 45000,
-                                             "payment_type": "cash",
-                                             "user": self.user.id,
-                                             "paid_course": self.course.id,
-                                             "paid_lesson": None
-                                             })
-        self.assertEqual(response_2.json(), {"id": 8,
-                                             "payday": datetime.now().strftime('%Y-%m-%d'),
-                                             "amount": 5000,
-                                             "payment_type": "card",
-                                             "user": self.user.id,
-                                             "paid_course": None,
-                                             "paid_lesson": self.lesson.id
-                                             })
-
-        self.assertEqual(response_1.status_code, status.HTTP_200_OK)
-        self.assertEqual(response_2.status_code, status.HTTP_200_OK)
-
-    def test_payment_update(self):
-        self.client.post('/courses/payment/create/', self.test_data_course)
-        self.client.post('/courses/payment/create/', self.test_data_lesson)
-        response_1 = self.client.patch('/courses/payment/update/9/',
-                                       {"payment_type": "card", "paid_lesson": self.lesson.id})
-        response_2 = self.client.patch('/courses/payment/update/10/', {"method_payment": "cash"})
-
-        self.assertEqual(response_1.json(), {"id": 9,
-                                             "payday": datetime.now().strftime('%Y-%m-%d'),
-                                             "amount": 45000,
-                                             "payment_type": "card",
-                                             "user": self.user.id,
-                                             "paid_course": self.course.id,
-                                             "paid_lesson": self.lesson.id
-                                             })
-        self.assertEqual(response_2.json(), {"id": 10,
-                                             "payday": datetime.now().strftime('%Y-%m-%d'),
-                                             "amount": 5000,
-                                             "payment_type": "cash",
-                                             "user": self.user.id,
-                                             "paid_course": None,
-                                             "paid_lesson": self.lesson.id
-                                             })
-        self.assertEqual(response_1.status_code, status.HTTP_200_OK)
-        self.assertEqual(response_2.status_code, status.HTTP_200_OK)
-
-
-    def test_payment_destroy(self):
-        self.client.post('/courses/payment/create/', self.test_data_course)
-        self.client.post('/courses/payment/create/', self.test_data_lesson)
-        response_1 = self.client.delete('/courses/payment/delete/3/')
-        response_2 = self.client.delete('/courses/payment/delete/4/')
-
-        self.assertEqual(response_1.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(response_2.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(ObjectDoesNotExist):
+            Subscription.objects.get(id=subscription.id)
 
 
 

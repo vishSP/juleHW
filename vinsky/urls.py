@@ -2,9 +2,8 @@ from vinsky.apps import VinskyConfig
 from rest_framework.routers import DefaultRouter
 from django.urls import path
 from vinsky.views import СourseViewSet, LessonCreateAPIView, LessonListAPIView, LessonRetrieveAPIView, \
-    LessonUpdateAPIView, LessonDestroyAPIView, PaymentsCreateAPIView, PaymentsListAPIView, \
-    PaymentsDetailAPIView, PaymentsUpdateAPIView, PaymentsDeleteAPIView, SubscriptionCreateView, SubscriptionDeleteView, \
-    SubscriptionUpdateView
+    LessonUpdateAPIView, LessonDestroyAPIView,  PaymentsListAPIView, \
+    PaymentIntentCreateView, PaymentMethodCreateView, PaymentIntentConfirmView ,SubscriptionCreateView, SubscriptionDeleteView
 
 app_name = VinskyConfig.name
 
@@ -21,14 +20,14 @@ urlpatterns = [
 
     #Payments
     path('payment/', PaymentsListAPIView.as_view(), name='payment_list'),
-    path('payment/create/', PaymentsCreateAPIView.as_view(), name='payment_create'),
-    path('paymentv/detail/<int:pk>/', PaymentsDetailAPIView.as_view(), name='payment_detail'),
-    path('payment/update/<int:pk>/', PaymentsUpdateAPIView.as_view(), name='payment_update'),
-    path('payment/delete/<int:pk>/', PaymentsDeleteAPIView.as_view(), name='payment_delete'),
+    path('payment-intent/create/', PaymentIntentCreateView.as_view(), name='payment_intent_create'),
+    path('payment-method/create/', PaymentMethodCreateView.as_view(), name='payment_method_create'),
+    path('payment-confirm/', PaymentIntentConfirmView.as_view(), name='payments_confirm'),
 
     #Subscription
     path('subscriptions/create/', SubscriptionCreateView.as_view(), name='subscription_create'),
     path('subscriptions/delete/<int:pk>/', SubscriptionDeleteView.as_view(), name='subscription_delete'),
-    path('subscriptions/update/<int:pk>/', SubscriptionUpdateView.as_view(), name='subscription_update'),
+
+
 
               ] + router.urls
