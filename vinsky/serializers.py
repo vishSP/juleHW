@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from vinsky.models import Сourse, Lesson, Payments, Subscription
-from vinsky.validators import VideoValidator
+from vinsky.validators import VideoValidator, CourseIdValidator
 
 
 class LessonSerializer(serializers.ModelSerializer):
