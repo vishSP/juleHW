@@ -2,8 +2,9 @@ from vinsky.apps import VinskyConfig
 from rest_framework.routers import DefaultRouter
 from django.urls import path
 from vinsky.views import СourseViewSet, LessonCreateAPIView, LessonListAPIView, LessonRetrieveAPIView, \
-    LessonUpdateAPIView, LessonDestroyAPIView,  PaymentsListAPIView, \
-    PaymentIntentCreateView, PaymentMethodCreateView, PaymentIntentConfirmView ,SubscriptionCreateView, SubscriptionDeleteView
+    LessonUpdateAPIView, LessonDestroyAPIView, PaymentsListAPIView, \
+    PaymentIntentCreateView, PaymentMethodCreateView, PaymentIntentConfirmView, SubscriptionCreateView, \
+    SubscriptionDeleteView, PaymentsDetailAPIView
 
 app_name = VinskyConfig.name
 
@@ -20,6 +21,7 @@ urlpatterns = [
 
     #Payments
     path('payment/', PaymentsListAPIView.as_view(), name='payment_list'),
+    path('payment/detail/<int:pk>/', PaymentsDetailAPIView.as_view(), name='payment_detail'),
     path('payment-intent/create/', PaymentIntentCreateView.as_view(), name='payment_intent_create'),
     path('payment-method/create/', PaymentMethodCreateView.as_view(), name='payment_method_create'),
     path('payment-confirm/', PaymentIntentConfirmView.as_view(), name='payments_confirm'),
