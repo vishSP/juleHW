@@ -60,7 +60,7 @@ class PaymentsListAPIView(generics.ListAPIView):
     queryset = Payments.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['paid_course', 'paid_lesson', 'payment_type']
-    ordering_fields = ['payment_date']
+    ordering_fields = ['payday']
     permission_classes = [IsModerator | IsOwner]
 
 
@@ -113,6 +113,8 @@ class PaymentMethodCreateView(generics.CreateAPIView):
             except Exception as error:
                 return Response({'error': str(error)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class PaymentIntentConfirmView(generics.CreateAPIView):
