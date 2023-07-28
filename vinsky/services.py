@@ -33,6 +33,7 @@ class StripeService:
             user=user,
             paid_course=course,
             payment_type=course.price,
+            amount=amount,
             payment_intent_id=payment_intent['id'],
             status=payment_intent['status']
         )
