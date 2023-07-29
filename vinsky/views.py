@@ -121,14 +121,15 @@ class PaymentIntentConfirmView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
 
-        serializer = PaymentIntentConfirmSerializer(data=request.data)
+        serializer = PaymentMethodCreateSerializer(data=request.data)
         if serializer.is_valid():
             payment_intent_id = serializer.validated_data['payment_intent_id']
+            payment_token = serializer.validated_data['payment_token']
             try:
-                StripeService.confirm_payment_intent(payment_intent_id)
+                StripeService.connection(payment_intent_id, payment_token)
                 payment = Payments.objects.get(payment_intent_id=payment_intent_id)
                 payment_serializer = PaymentSerializer(payment)
-                return Response(payment_serializer.data, status=status.HTTP_201_CREATED)
+                return Response(payment_serializer.data)
             except Exception as error:
-                return Response({"error": str(error)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': str(error)})
+        return Response(serializer.errors)
