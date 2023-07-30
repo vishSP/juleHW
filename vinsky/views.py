@@ -90,11 +90,11 @@ class PaymentIntentCreateView(generics.CreateAPIView):
                 payment_intent = StripeService.create_payment_intent(course_id, user_id)
                 payment = Payments.objects.get(payment_intent_id=payment_intent['id'])
                 payment_serializer = PaymentSerializer(payment)
-                return Response(payment_serializer.data, status=status.HTTP_201_CREATED)
+                return Response(payment_serializer.data)
             except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': str(e)})
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors)
 
 
 class PaymentMethodCreateView(generics.CreateAPIView):
@@ -109,10 +109,10 @@ class PaymentMethodCreateView(generics.CreateAPIView):
                 StripeService.connection(payment_intent_id, payment_token)
                 payment = Payments.objects.get(payment_intent_id=payment_intent_id)
                 payment_serializer = PaymentSerializer(payment)
-                return Response(payment_serializer.data, status=status.HTTP_201_CREATED)
+                return Response(payment_serializer.data)
             except Exception as error:
-                return Response({'error': str(error)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': str(error)})
+        return Response(serializer.errors)
 
 
 
