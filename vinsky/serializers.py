@@ -14,7 +14,6 @@ class LessonSerializer(serializers.ModelSerializer):
             "text",
             "preview",
             "link",
-            "price",
             "user",
         )
 
