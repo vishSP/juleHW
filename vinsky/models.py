@@ -12,6 +12,7 @@ class Сourse(models.Model):
     text = models.TextField(verbose_name='описание')
     price = models.IntegerField(default=5000, verbose_name='стоимость курса')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, **NULLABLE, verbose_name='автор')
+    last_update = models.DateTimeField(verbose_name='время обновления', **NULLABLE)
     def __str__(self):
         return f'{self.title}'
 

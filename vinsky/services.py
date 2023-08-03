@@ -4,6 +4,8 @@ from config import settings
 from vinsky.models import Сourse, Payments, Subscription
 from users.models import User
 
+class StripeServiceError(Exception):
+    pass
 
 class StripeService:
     api_key = settings.STRIPE_SECRET_KEY
@@ -11,13 +13,11 @@ class StripeService:
     base_url = 'https://api.stripe.com/v1'
 
     @classmethod
-    def create_payment_intent(cls, course_id, user_id):
-        course = Сourse.objects.get(id=course_id)
-        amount = course.price
-        user = User.objects.get(id=user_id)
+    def create_payment_intent(cls, course, user):
+
 
         data = [
-            ('amount', amount * 100),
+            ('amount', course.price * 100),
             ('currency', 'rub'),
             ('metadata[course_id]', course.id),
             ('metadata[user_id]', user.id)
@@ -25,7 +25,9 @@ class StripeService:
         response = requests.post(f'{cls.base_url}/payment_intents', headers=cls.headers, data=data)
 
         if response.status_code != 200:
-            raise Exception(f'Ошибка намерения платежа: {response.status_code}')
+            raise StripeServiceError(
+                f'Ошибка намерения платежа: {response.status_code}, {response.text}'
+            )
 
         payment_intent = response.json()
 

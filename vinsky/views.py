@@ -1,9 +1,10 @@
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
+from rest_framework.exceptions import APIException
 from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAdminUser
-
+from vinsky.tasks import notify_course_updates, notify_lesson_updates
 from users.serializers import PaymentSerializer
 from vinsky.models import Сourse, Lesson, Payments, Subscription
 from vinsky.pagination import MaterialsPagination
@@ -11,7 +12,7 @@ from vinsky.permissions import IsModerator, IsOwner
 
 from vinsky.serializers import СourseSerializer, LessonSerializer, PaymentsSerializer, SubscriptionSerializer, \
     PaymentIntentCreateSerializer, PaymentMethodCreateSerializer, PaymentIntentConfirmSerializer
-from vinsky.services import StripeService
+from vinsky.services import StripeService, StripeServiceError
 
 
 class СourseViewSet(viewsets.ModelViewSet):
@@ -20,6 +21,10 @@ class СourseViewSet(viewsets.ModelViewSet):
     queryset = Сourse.objects.all()
     permission_classes = [IsAdminUser | IsModerator | IsOwner]
 
+    def perform_update(self, serializer):
+        self.object = serializer.save()
+        notify_course_updates.delay(self.object.pk)
+
 
 class LessonListAPIView(generics.ListAPIView):
     pagination_class = MaterialsPagination
@@ -27,6 +32,9 @@ class LessonListAPIView(generics.ListAPIView):
     queryset = Lesson.objects.all()
     permission_classes = [IsModerator | IsOwner]
 
+    def perform_update(self, serializer):
+         self.object = serializer.save()
+         notify_lesson_updates.delay(self.object.pk)
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
@@ -63,6 +71,11 @@ class PaymentsListAPIView(generics.ListAPIView):
     ordering_fields = ['payday']
     permission_classes = [IsModerator | IsOwner]
 
+    class StripeServiceError(APIException):
+        status_code = 400
+        default_detail = 'Ошибка сервиса Stripe'
+        default_code = 'stripe_error'
+
 
 class PaymentsDetailAPIView(generics.RetrieveAPIView):
     serializer_class = PaymentSerializer
@@ -83,18 +96,23 @@ class SubscriptionDeleteView(generics.DestroyAPIView):
 class PaymentIntentCreateView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = PaymentIntentCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            course_id = serializer.validated_data['course_id']
-            user_id = request.user.id
-            try:
-                payment_intent = StripeService.create_payment_intent(course_id, user_id)
-                payment = Payments.objects.get(payment_intent_id=payment_intent['id'])
-                payment_serializer = PaymentSerializer(payment)
-                return Response(payment_serializer.data, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        try:
+            course = serializer.validated_data['course']
+            user_id = request.user
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            payment_intent = StripeService.create_payment_intent(course, user_id)
+            payment = Payments.objects.get(payment_intent_id=payment_intent['id'])
+        except StripeServiceError as e:
+            raise StripeServiceError(detail=str(e))
+
+        except Payments.DoesNotExist:
+            raise APIException(detail='Платеж не найден')
+        else:
+            data = PaymentSerializer(payment).data
+            status_code = status.HTTP_201_CREATED
+
+            return Response(data, status=status_code)
 
 
 class PaymentMethodCreateView(generics.CreateAPIView):

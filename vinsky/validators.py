@@ -14,13 +14,3 @@ class VideoValidator:
             raise serializers.ValidationError("Только youtube.com ссылки ")
 
 
-class CourseIdValidator:
-
-    def __init__(self, field):
-        self.field = field
-
-    def __call__(self, value):
-        course = Сourse.objects.get(id=value)
-        if not course:
-            raise serializers.ValidationError(f"Курса c ID {value} не существует")
-        return value

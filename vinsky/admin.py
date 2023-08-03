@@ -4,7 +4,7 @@ from vinsky.models import Сourse, Lesson, Subscription
 
 @admin.register(Сourse)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('id','title', 'preview', 'text', 'user')
+    list_display = ('id','title', 'preview', 'text', 'user', 'last_update')
 
 
 @admin.register(Lesson)

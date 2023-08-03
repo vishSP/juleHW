@@ -3,7 +3,7 @@ from rest_framework.test import APITestCase
 from datetime import datetime
 
 from rest_framework import status
-from vinsky.models import Сourse, Lesson, Payments, Subscription
+from vinsky.models import Сourse, Payments, Subscription
 from users.models import User
 
 
@@ -133,7 +133,7 @@ class SubscribeTestCase(SetupTestCase):
     def setUp(self):
         super().setUp()
 
-        self.course = Course.objects.create(
+        self.course = Сourse.objects.create(
             name='Test course',
             description='Test description',
             price=100

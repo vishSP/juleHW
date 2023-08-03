@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from vinsky.models import Сourse, Lesson, Payments, Subscription
-from vinsky.validators import VideoValidator, CourseIdValidator
+from vinsky.validators import VideoValidator
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -68,7 +68,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 
 class PaymentIntentCreateSerializer(serializers.Serializer):
-    course_id = serializers.IntegerField(validators=[CourseIdValidator(field='course_id')])
+    course_id = serializers.PrimaryKeyRelatedField(source='course', queryset=Сourse.objects.all())
 
 
 class PaymentMethodCreateSerializer(serializers.Serializer):
