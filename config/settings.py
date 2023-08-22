@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-y2oh=@8t&1*k^f71v3$cl82&j#%ys%$7!wn1-0z=(0mf8uwo2k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -103,7 +103,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'jule_db',
         'USER': 'postgres',
-        'PASSWORD': '1620'
     }
 }
 
